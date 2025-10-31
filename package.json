@@ -1,0 +1,12 @@
+{
+  "name": "halloween-game",
+  "version": "1.0.0",
+  "description": "Juego de Halloween con reconocimiento facial en modo kiosko",
+  "main": "electron-main.js",
+  "scripts": {
+    "start": "electron ."
+  },
+  "devDependencies": {
+    "electron": "^39.0.0"
+  }
+}

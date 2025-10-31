@@ -21,32 +21,44 @@ An interactive web application that uses computer vision technologies to create 
 ## 🚀 Quick Start
 
 ```bash
-# Installation
+# Download the project
+Go to the project folder and execute in the terminal:
+
+# Install dependencies
 npm install
 
-# Development
-
-
-# Build Electron
-npm run electron
+# Run the application
+npm run start
 ```
 
 ## 🎮 How to Play
 
-1. Click "Start Adventure"
-2. Allow camera access
-3. Open your mouth to generate magic particles!
-4. Try to "brush" all the ghost teeth
+- Type and save your name
+- Allow camera access
+- Open your mouth to generate magic particles!
+- Try to "brush" all the ghost teeth
 
 ## 📁 Project Structure
 
 ```
 src/
-├── face-detector/    # Facial detection
-├── particle-system/  # Particle system
-├── audio/           # Sound effects
-├── assets/          # Images and resources
-└── ui/              # User interface
+├── assets/    # Resources
+├── assets/...
+├── js/        # Logic
+├── js/camera.js
+├── js/game.js
+├── js/main.js
+├── js/ui.js
+├── models/    # Facial detection
+├── models/...
+├── node-modules/
+├── electron-main.js # Facial detection
+├── face-api.min.js  # Facial detection
+├── index.html
+├── package.json
+├── preload.js
+└── README.md
+└── style.css
 ```
 
 ## 🎯 Usage
