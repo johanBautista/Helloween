@@ -2,10 +2,21 @@ body {
   margin: 0;
   padding: 0;
   background-color: #0d0d0d;
+  background: url("./assets/back_start.jpg");
+  background-size: cover;
   color: #ff7518;
+  color: #fffdfd;
   font-family: "Creepster", cursive;
   text-align: center;
   font-size: 2rem;
+}
+
+#game-canvas,
+#overlay-canvas {
+  position: absolute;
+  top: 0;
+  left: 0;
+  pointer-events: none;
 }
 
 .screen {

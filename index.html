@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Juego de Halloween 🎃</title>
+    <title>🎃 Halloween 🎃</title>
     <link
       href="https://fonts.googleapis.com/css2?family=Creepster&display=swap"
       rel="stylesheet"
@@ -17,7 +17,12 @@
       <section id="start-screen" class="screen">
         <h1 class="start_screen-tittle">🎃 Noche de Halloween 🎃</h1>
         <p id="instructions-text">Ingresa tu nombre</p>
-        <input id="player-name" type="text" placeholder="Tu nombre..." />
+        <input
+          id="player-name"
+          type="text"
+          placeholder="Tu nombre..."
+          autocomplete="off"
+        />
         <button id="save-name">Guardar nombre 💀</button>
         <button id="camera-btn" class="hidden">Activar cámara 📸</button>
 
@@ -35,6 +40,7 @@
         <div id="game-area">
           <h2>👻 ¡Aquí empieza el juego! 👻</h2>
           <video id="video" autoplay muted width="760" height="760"></video>
+          <canvas id="game-canvas"></canvas>
         </div>
       </section>
 

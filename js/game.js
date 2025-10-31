@@ -1,19 +1,29 @@
-// =============================
-// game.js - Lógica del juego
-// =============================
-
 let canvas, ctx;
-let carrots = [];
+let candies = [];
 let ghosts = [];
 let player = { x: 0, y: 0 };
 let mouthOpen = false;
 
-// --- CONFIG ---
-const CARROT_INTERVAL = 1000; // cada 1s cae una zanahoria
-const GHOST_SPEED = -2;
-const CARROT_SPEED = 3;
+// 🧙‍♀️ Gorro e imagen
+let witchHatImg = new Image();
+witchHatImg.src = "./assets/witch-hat.png";
 
-// Cargar el canvas una vez
+// 👻 Sonido del fantasma
+const ghostSound = new Audio("./assets/ghost.mp3");
+
+// --- CONFIG ---
+const CANDY_INTERVAL = 2000; // cada 2s
+const GHOST_GROWTH = 1.3; // crecimiento progresivo
+const MAX_GHOST_SIZE = 80;
+const CANDY_SPEED = 3;
+const GHOST_RISE_SPEED = -2;
+
+// 🎃 Array de emojis de caramelos
+const candyEmojis = ["🍬", "🍭", "🍫", "🧁", "🍡", "🍩", "🍪"];
+
+// =============================
+// Inicializar canvas del juego
+// =============================
 export function initGameCanvas(videoElement) {
   canvas = faceapi.createCanvasFromMedia(videoElement);
   document.body.append(canvas);
@@ -25,51 +35,71 @@ export function initGameCanvas(videoElement) {
     height: videoElement.height,
   });
 
-  // 💡 Añade esto para posicionarlo sobre el video:
+  // Posicionar sobre el video
   canvas.style.position = "absolute";
   canvas.style.top = `${videoElement.offsetTop}px`;
   canvas.style.left = `${videoElement.offsetLeft}px`;
-  canvas.style.pointerEvents = "none"; // para que no bloquee clics
+  canvas.style.pointerEvents = "none"; // No bloquear clics
 
   return canvas;
 }
 
-// Dibuja los objetos del juego
+// =============================
+// Dibujar elementos del juego
+// =============================
 function drawObjects() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-  // Dibujar zanahorias 🥕
-  ctx.font = "130px Arial";
-  carrots.forEach((c) => {
-    ctx.fillText("🍬", c.x, c.y);
-    c.y += CARROT_SPEED;
+  // 🍭 Dibujar caramelos cayendo
+  ctx.font = "40px Arial";
+  candies.forEach((c) => {
+    ctx.fillText(c.emoji, c.x, c.y);
+    c.y += CANDY_SPEED;
   });
-  carrots = carrots.filter((c) => c.y < canvas.height);
+  candies = candies.filter((c) => c.y < canvas.height);
 
-  // Dibujar fantasmas 👻
-  ctx.font = "240px Arial";
+  // 👻 Dibujar fantasmas
   ghosts.forEach((g) => {
+    ctx.save();
+    ctx.font = `${g.size}px Arial`;
     ctx.fillText("👻", g.x, g.y);
-    g.y += GHOST_SPEED;
+    ctx.restore();
+
+    // Crecen y suben
+    if (g.size < MAX_GHOST_SIZE) g.size += GHOST_GROWTH;
+    g.y += GHOST_RISE_SPEED;
   });
   ghosts = ghosts.filter((g) => g.y > -50);
 
-  // Dibujar cepillo 🪥 (controlado por la cabeza)
-  //   ctx.font = "40px Arial";
-  //   ctx.fillText("🪥", player.x - 20, player.y + 50);
+  // 🧙‍♀️ Dibujar gorro de bruja
+  if (player.x && player.y) {
+    const hatX = player.x - 180;
+    const hatY = player.y - 360;
+    ctx.drawImage(witchHatImg, hatX, hatY, 340, 340);
+  }
 }
 
-// Crear zanahorias
-function spawnCarrot() {
-  carrots.push({ x: Math.random() * canvas.width, y: 0 });
+// =============================
+// Crear elementos
+// =============================
+function spawnCandy() {
+  const emoji = candyEmojis[Math.floor(Math.random() * candyEmojis.length)];
+  candies.push({ emoji, x: Math.random() * canvas.width, y: 0 });
 }
 
-// Crear fantasmas
-function spawnGhost() {
-  ghosts.push({ x: Math.random() * canvas.width, y: canvas.height - 50 });
+function spawnGhost(x, y) {
+  try {
+    ghostSound.currentTime = 0;
+    ghostSound.play();
+  } catch (err) {
+    // ignorar errores de autoplay bloqueado
+  }
+  ghosts.push({ x, y, size: 10 });
 }
 
-// Bucle principal del juego
+// =============================
+// Lógica principal del juego
+// =============================
 export function updateGame(detections) {
   if (!detections.length) return;
 
@@ -78,26 +108,30 @@ export function updateGame(detections) {
   const mouth = landmarks.getMouth();
   const nose = landmarks.getNose();
 
-  // 1️⃣ Detectar si la boca está abierta
+  // 1️ Detectar si la boca está abierta
   const topLip = mouth[13].y;
   const bottomLip = mouth[19].y;
   mouthOpen = bottomLip - topLip > 20;
 
-  // 2️⃣ Si abre la boca → aparece un fantasma 👻
+  // 2️ Si abre la boca → generar fantasma desde la boca
   if (mouthOpen && Math.random() < 0.1) {
-    spawnGhost();
+    const mouthCenterX = (mouth[13].x + mouth[19].x) / 2;
+    const mouthCenterY = (mouth[13].y + mouth[19].y) / 2;
+    spawnGhost(mouthCenterX, mouthCenterY);
   }
 
-  // 3️⃣ Controlar el cepillo con la cabeza (nariz)
+  // 3️ Actualizar posición de cabeza (para el gorro)
   const nosePoint = nose[3];
   player.x = nosePoint.x;
   player.y = nosePoint.y;
 
-  // 4️⃣ Dibujar todos los elementos
+  // 4️ Dibujar todo
   drawObjects();
 }
 
-// Iniciar caída de zanahorias
-export function startCarrots() {
-  setInterval(spawnCarrot, CARROT_INTERVAL);
+// =============================
+// Iniciar caída de caramelos 🍭
+// =============================
+export function startCandyRain() {
+  setInterval(spawnCandy, CANDY_INTERVAL);
 }

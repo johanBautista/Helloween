@@ -13,7 +13,7 @@ An interactive web application that uses computer vision technologies to create 
 ## 🛠️ Technologies
 
 - **Vanilla JavaScript** (ES6+)
-- **-----** + **Face Landmarks Detection**
+- **FaceApi** + **Face Landmarks Detection**
 - **Canvas API** for graphics and animations
 - **WebRTC** for camera access
 - **Electron** for desktop packaging

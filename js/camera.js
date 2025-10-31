@@ -2,18 +2,17 @@
 // camera.js - Control de cámara y Face API
 // =============================
 
-import { initGameCanvas, startCarrots, updateGame } from "./game.js";
+import { initGameCanvas, startCandyRain, updateGame } from "./game.js";
 
 let videoStream = null;
 const elVideo = document.getElementById("video");
+let showDebug = false;
 
 // Cargar los modelos Face API
 export async function loadFaceModels() {
   await Promise.all([
     faceapi.nets.tinyFaceDetector.loadFromUri("./models"),
     faceapi.nets.faceLandmark68Net.loadFromUri("./models"),
-    faceapi.nets.faceExpressionNet.loadFromUri("./models"),
-    faceapi.nets.ageGenderNet.loadFromUri("./models"),
   ]);
   console.log("✅ Modelos Face API cargados");
 }
@@ -33,22 +32,20 @@ export async function startCamera() {
 // Iniciar detección facial
 export async function startFaceDetection() {
   const videoElement = document.getElementById("video");
-
-  //   const canvas = faceapi.createCanvasFromMedia(videoElement);
-  //   document.body.append(canvas);
-  //   // Alinear el canvas sobre el video
-  //   canvas.style.position = "absolute";
-  //   canvas.style.top = `${videoElement.offsetTop}px`;
-  //   canvas.style.left = `${videoElement.offsetLeft}px`;
-
   const canvas = initGameCanvas(videoElement);
-  startCarrots();
+  startCandyRain();
 
   const displaySize = {
     width: videoElement.width,
     height: videoElement.height,
   };
   faceapi.matchDimensions(canvas, displaySize);
+
+  // Teclas para alternar depuración
+  window.addEventListener("keydown", (e) => {
+    if (e.key.toLowerCase() === "d") showDebug = true;
+    if (e.key.toLowerCase() === "h") showDebug = false;
+  });
 
   setInterval(async () => {
     const detections = await faceapi
@@ -60,24 +57,16 @@ export async function startFaceDetection() {
         })
       )
       .withFaceLandmarks();
-    //   .withFaceExpressions()
-    //   .withAgeAndGender();
 
     const resizedDetections = faceapi.resizeResults(detections, displaySize);
     const context = canvas.getContext("2d");
     context.clearRect(0, 0, canvas.width, canvas.height);
 
-    // faceapi.draw.drawDetections(canvas, resizedDetections);
-    // faceapi.draw.drawFaceLandmarks(canvas, resizedDetections);
-    // // faceapi.draw.drawFaceExpressions(canvas, resizedDetections);
-
-    // resizedDetections.forEach((detection) => {
-    //   const { box } = detection.detection;
-    //   const label = `${Math.round(detection.age)} años - ${detection.gender}`;
-    //   new faceapi.draw.DrawBox(box, { label }).draw(canvas);
-    // });
-
     updateGame(resizedDetections);
-    faceapi.draw.drawFaceLandmarks(canvas, resizedDetections);
+
+    // Mostrar puntos de referencia si está en modo depuración
+    if (showDebug) {
+      faceapi.draw.drawFaceLandmarks(canvas, resizedDetections);
+    }
   }, 100);
 }

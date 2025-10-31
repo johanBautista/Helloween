@@ -20,12 +20,15 @@ const instructionsText = document.getElementById("instructions-text");
 const popup = document.getElementById("popup");
 const closePopupBtn = document.getElementById("close-popup");
 const playerDisplay = document.getElementById("player-display");
+const musicBSO = new Audio("./assets/music-bso.mp3"); // background sound 🎶
 
 // =============================
 // EVENTOS PRINCIPALES
 // =============================
 
-// 1️⃣ Guardar nombre
+musicBSO.loop = true;
+
+// 1️ Guardar nombre
 saveNameBtn.addEventListener("click", () => {
   const name = nameInput.value.trim();
   if (!name) {
@@ -33,6 +36,7 @@ saveNameBtn.addEventListener("click", () => {
     return;
   }
 
+  musicBSO.play();
   playerName = name;
   hideElement(nameInput);
   hideElement(saveNameBtn);
@@ -40,11 +44,11 @@ saveNameBtn.addEventListener("click", () => {
   showElement(readyButtons);
 });
 
-// 2️⃣ Mostrar / cerrar popup
+// 2️ Mostrar / cerrar popup
 showInstructionsBtn.addEventListener("click", () => showPopup(popup));
 closePopupBtn.addEventListener("click", () => hidePopup(popup));
 
-// 3️⃣ Iniciar juego (ahora carga cámara y Face API)
+// 3️ Iniciar juego (ahora carga cámara y Face API)
 startGameBtn.addEventListener("click", async () => {
   hideElement(startScreen);
   showElement(gameScreen);
@@ -55,7 +59,6 @@ startGameBtn.addEventListener("click", async () => {
 
   await loadFaceModels(); // Cargar modelos
   await startCamera(); // Activar cámara
-  //------se carga antes y da error await startFaceDetection(); // Comenzar detección
 
   // Esperar a que el video esté listo
   const videoElement = document.getElementById("video");
@@ -67,5 +70,7 @@ startGameBtn.addEventListener("click", async () => {
   console.log("👻 Juego iniciado con detección facial activa");
 });
 
-// 4️⃣ Resetear juego
-resetGameBtn.addEventListener("click", () => window.location.reload());
+// 4️ Resetear juego
+resetGameBtn.addEventListener("click", () => {
+  window.location.reload();
+});
